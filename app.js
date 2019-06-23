@@ -5,7 +5,45 @@ const dbName = 'CR_A';
 var email_server = require('./email_server.js');
 var readFile = require('./readFile.js');
 var order = require('./place_order.js');
-let order_data = {};
+
+ var order_data = {
+    "OrderBy": "",
+    "SplitBillType": 1,
+    "InvoiceNo": 0,
+    "SplitBillTypeCount": 0,
+    "Coupons": [{
+     "CustomerMob": "",
+     "CouponCode": "",
+     "type": "",
+     "Discount": ""
+    }],
+    "Date": "06\/21\/2019",
+    "DateTime": "2019-06-21 02:12:57",
+    "IsB2C": false,
+    "IsComplementory": false,
+    "IsKitchenPrint": false,
+    "IsSpoil": false,
+    "IsSync": false,
+    "OrderBooking": {
+     "DeliveryCharges": 0,
+     "PosId": 1,
+     "StoreCode": 101
+    },
+    "OrderStatus": 3,
+    "OrderType": 1,
+    "paymentMode": 2,
+    "Source": 3,
+    "SpecialRequest": "",   
+    "subTotal": 6.47,
+    "tax": 0,
+    "taxAmount": 6.47,
+    "Taxes": "",
+    "tenderAmount": "",
+    "TimeStamp": new Date().getTime(),
+    "total": 6.47,
+    "Zone": ""
+   };
+
 // order.placeOrder();
 // var mongo = await require('./mongo.js').getDb();
 
@@ -13,7 +51,74 @@ let order_data = {};
 email_server.checkEmail().then(function(){
 	readFile.getData().then((data)=>{
 		console.log(data);
-		searchProduct(data.products);
+		
+		order_data['CustomerDetails']={
+			"Address": [data.customer.city],
+			"DOB": "",
+			"EmailID": null,
+			"FirstName": data.customer.name,
+			"LastName": '',
+			"LoyaltyPoint": 0,
+			"Mobile": null,
+			"RedeemLoyaltyPoint": 0
+		   }
+
+		searchProduct(data.products).then((products)=>{
+
+			if(products.length){
+
+				order_data['ItemDetails']=products.map((obj)=>{
+
+					return{
+					"calculated_tax": "0.149",
+					"categoryId": "5ca864e3f674bc3b65712b62",
+					"isCartConfirmItem": true,
+					"IsComplementory": false,
+					"isConfirmItem": false,
+					"isDrink": false,
+					"isPrintKot": false,
+					"isSelect": false,
+					"IsSpoil": false,
+					"isSynced": false,
+					"ItemID": "5ca864e3f674bc3b65712b62",
+					"ItemName": obj.ItemName,
+					"Quantity": 1,
+					"Price": obj.Price,
+					"ItemStatus": 1,
+					"Modifiers": [],
+					"Taxes": [],
+					"Unit": "QTY",
+					"Extras": ""
+					}
+				})
+			}else{
+				console.log('products not found in store database');
+			}
+
+			console.log(JSON.stringify(order_data));
+		});
+
+		order_data['PaymentTrans'] = {
+			"DeliveryCharges": data.order.delivery,
+			"Discount": 0,
+			"DiscountAmount": 0,
+			"PackagingCharges": 0,
+			"ServiceTax": 0,
+			"SplitTransactions": [],
+			"StoreCode": 121,
+			"SubTotal": data.order.subtotal,
+			"Tip": data.order.tip,
+			"TipAmount": 0,
+			"TotalAmount": data.order.total,
+			"TotalTaxAmount": data.order.tip
+		   }
+
+		   order_data['OrderBooking']['StoreCode'] = 121;
+
+		   order_data['subTotal'] = data.order.subtotal;
+		   order_data['taxAmount'] = data.order.tax;
+		   order_data['total'] = data.order.total;
+
 	});
 })
 // console.log(mongo);
@@ -23,7 +128,8 @@ email_server.checkEmail().then(function(){
 // })
 
 function searchProduct(product_data){
-	MongoClient.connect(url).then(function(db){
+	return new Promise((resolve,reject)=>{
+		MongoClient.connect(url).then(function(db){
 
 			let item_query = product_data.map((obj)=>{
 				return {ItemName:obj.name.trim()}
@@ -37,9 +143,12 @@ function searchProduct(product_data){
 			console.log(db);
 			db.collection('ItemMaster').find(query).toArray().then((data)=>{
 				console.log(data);
+				if(data)
+					resolve(data);
 			})
 		
 		})
+	})
 }
 
 // Connection URL
