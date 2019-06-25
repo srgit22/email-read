@@ -5,26 +5,37 @@ var fs = require('fs');
 var Imap = require('imap');
 //configure imap credentials
 var imap = new Imap({
-  user: 'dropmailsanjayrawat@gmail.com',
-  password: 'password4gmail#123', 
-  host: 'imap.gmail.com',
-	// user:'sanjay.rawat@cyntralabs.com',
-	// password:'newpw@Cyntralab123',
-	// host:'imap.mail.yahoo.com',
-	port: 993,
-	tls: true,
-	tlsOptions: {
-		rejectUnauthorized: false
-	}
+    user: 'dropmailsanjayrawat@gmail.com',
+    password: 'password4gmail#123', 
+    host: 'imap.gmail.com',
+    // user:'sanjay.rawat@cyntralabs.com',
+    // password:'newpw@Cyntralab123',
+    // host:'imap.mail.yahoo.com',
+    port: 993,
+    tls: true,
+    tlsOptions: {
+        rejectUnauthorized: false
+    }
 });
 
 function openInbox(cb) {
 	imap.openBox('INBOX', true, cb);
 }
 
+async function checkEmailProcessed(seq_no){
+    return new Promise((resolve,reject)=>{
+        var seq_arr = JSON.parse(fs.readFileSync('Order_Ids.json', 'utf8'));
+        if(!seq_arr.includes(seq_no)){
+            seq_arr.push(seq_no);
+            fs.writeFileSync('Order_Ids.json', JSON.stringify(seq_arr), 'utf8');
+        }
+        resolve();
+    })
+}
+
 module.exports ={
 
-    checkEmail:function(){
+    checkEmail:function(vendor){
 
         return new Promise((resolve,reject)=>{
             imap.once('ready', function() {
@@ -35,7 +46,7 @@ module.exports ={
 
                     if (err) throw err;
                         
-                    imap.search( [['HEADER', 'SUBJECT', 'GrubHub']], function(err, results) {
+                    imap.search( [['HEADER', 'SUBJECT', vendor]], function(err, results) {
                         
                         if (err) throw err;
                         var f = imap.fetch(results, { bodies: '' });
@@ -45,20 +56,26 @@ module.exports ={
                             console.log('Message #%d', seqno);
                             var prefix = '(#' + seqno + ') ';
 
-                            msg.on('body', function(stream, info) {
-                                
-                                console.log(prefix + 'Body');
 
-                                stream.on('data',function(chunk){
-                                    // simpleParser(chunk, {}, (err, parsed) => {
-                                    // 	console.log(parsed);
-                                    // 			fs.writeFileSync('mail_data.txt', '\n '+JSON.stringify(parsed), 'utf8'); 
-                                    // });
-                                    fs.writeFileSync('email_data.txt', '\n '+chunk, 'utf8'); 
-                                })
-                                    
-                
-                            });
+                            checkEmailProcessed(seqno).then((abc)=>{
+                                msg.on('body', function(stream, info) {
+                                
+                                    console.log(prefix + 'Body');
+    
+                                    stream.on('data',function(chunk){
+                                        // simpleParser(chunk, {}, (err, parsed) => {
+                                        // 	console.log(parsed);
+                                        // 			fs.writeFileSync('mail_data.txt', '\n '+JSON.stringify(parsed), 'utf8'); 
+                                        // });
+                                        fs.writeFileSync('email_data.txt', '\n '+prefix, 'utf8'); 
+                                        fs.appendFileSync('email_data.txt', '\n '+chunk, 'utf8'); 
+                                    })
+                                        
+                    
+                                });
+                            })
+
+
 
                             msg.once('attributes', function(attrs) {
                                 // console.log(prefix + ‘Attributes: %s’, inspect(attrs, false, 8));

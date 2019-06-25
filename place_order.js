@@ -125,8 +125,8 @@ var order_data = {
    };
 
 module.exports={
-    placeOrder:function(){
-        axios.post('http://184.72.111.178:6060/api/placeOrder', order_data)
+    placeOrder:function(data){
+        axios.post('http://184.72.111.178:6060/api/placeOrder', data)
           .then(function (response) {
             console.log(response);
           })

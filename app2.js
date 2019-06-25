@@ -9,7 +9,7 @@ var config = {
         tls: true,
         authTimeout: 13000,
         tlsOptions: {
-            rejectUnauthorized: false
+                rejectUnauthorized: false
             }
     }
 };
