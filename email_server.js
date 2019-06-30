@@ -1,6 +1,8 @@
 var Imap = require('imap'),
     inspect = require('util').inspect;
+
 var fs = require('fs');    
+var helper = require('./helper.js');
 
 var Imap = require('imap');
 //configure imap credentials
@@ -22,20 +24,24 @@ function openInbox(cb) {
 	imap.openBox('INBOX', true, cb);
 }
 
-async function checkEmailProcessed(seq_no){
-    return new Promise((resolve,reject)=>{
-        var seq_arr = JSON.parse(fs.readFileSync('Order_Ids.json', 'utf8'));
-        if(!seq_arr.includes(seq_no)){
-            seq_arr.push(seq_no);
-            fs.writeFileSync('Order_Ids.json', JSON.stringify(seq_arr), 'utf8');
-        }
-        resolve();
-    })
-}
+
 
 module.exports ={
 
     checkEmail:function(vendor){
+
+        var search;
+        
+        switch(vendor) {
+            case 'grubhub':
+                search = 'from GrubHub.com';
+              break;
+            case 'swiggy':
+                search = 'Swiggy order';
+              break;
+            default:
+              // code block
+          }
 
         return new Promise((resolve,reject)=>{
             imap.once('ready', function() {
@@ -46,7 +52,7 @@ module.exports ={
 
                     if (err) throw err;
                         
-                    imap.search( [['HEADER', 'SUBJECT', vendor]], function(err, results) {
+                    imap.search( [['HEADER', 'SUBJECT', search]], function(err, results) {
                         
                         if (err) throw err;
                         var f = imap.fetch(results, { bodies: '' });
@@ -57,7 +63,6 @@ module.exports ={
                             var prefix = '(#' + seqno + ') ';
 
 
-                            checkEmailProcessed(seqno).then((abc)=>{
                                 msg.on('body', function(stream, info) {
                                 
                                     console.log(prefix + 'Body');
@@ -67,14 +72,19 @@ module.exports ={
                                         // 	console.log(parsed);
                                         // 			fs.writeFileSync('mail_data.txt', '\n '+JSON.stringify(parsed), 'utf8'); 
                                         // });
-                                        fs.writeFileSync('email_data.txt', '\n '+prefix, 'utf8'); 
-                                        fs.appendFileSync('email_data.txt', '\n '+chunk, 'utf8'); 
+                                        helper.checkEmailProcessed(seqno).then((abc)=>{
+                                            fs.writeFileSync('email_data.txt', '\n '+prefix, 'utf8'); 
+                                            fs.appendFileSync('email_data.txt', '\n '+chunk, 'utf8');
+                                        }); 
                                     })
                                         
-                    
                                 });
-                            })
 
+
+                        
+                            // }).catch((err)=>{
+                            //     console.log(err);
+                            // })
 
 
                             msg.once('attributes', function(attrs) {

@@ -1,5 +1,8 @@
 var fs = require('fs');
+var ce = require('./CommonEvent.js');
 var helper = require('./helper.js');
+var vendors = require('./vendors.js');
+
 
 var data_arr=[];
 
@@ -37,139 +40,26 @@ function readLines(input, func) {
 }
 
 
-async function start(vendor){
-  var input = fs.createReadStream('email_data.txt');
-  var result = await readLines(input, func);
-  return process(vendor);
+async function convertToArray(file){
+  var input = fs.createReadStream(file);
+  return readLines(input, func);
 }
 
-function extractData(data_arr,start,stop){
-    
-    var record =false;
-    let data = [];
+// function readJson(file){
+//   return fs.readFileSync('Order_Ids.json','utf8');
+// }
 
-    for(let line of data_arr){
+// function writeJson(arr){;
+//   fs.writeFileSync('Order_Ids.json', JSON.stringify(arr), 'utf8'); 
+// }
 
-        if(line.includes(start)){
-            record=true;
-        }
-        
-        if(record){
-          data.push(line);
-        }
-        
-        if(line.includes(stop)){
-            record = false;
-        }
-    }
-
-    return data;    
-}
-
-function process(vendor){
-  return new Promise((resolve,reject)=>{
-
-    let products = [],product_data,order_data,customer_data;
-    let order,customer,order_id_arr;
-    let obj;
-  
-    if(vendor=='GrubHub.com'){
-      
-      product_data = extractData(data_arr,'| Qty | Item | Price |','Prepaid. DO NOT charge');
-      order_data = extractData(data_arr,'| Subtotal |','| Total |');
-      order_id_arr = extractData(data_arr,'Order #','Order #');
-      customer_data = extractData(data_arr,'| Deliver to: | Deliver |','| Special Instructions |');
-      console.log(data_arr);
-    }
-    if(vendor=='swiggy'){
-
-    }
-
-    // let store_data = extractData(data_arr,'Customer Service: 877-798-4141','| Deliver to: | Deliver |');
-    // console.log(store_data);
-
-    products = getProduct(product_data);
-    customer = getCustomer(customer_data);
-    order = getOrder(order_data,order_id_arr);
  
-      if(products.length>0 && !helper.checkEmpty(customer) && !helper.checkEmpty(order)){
-        console.log({
-          status:1,
-          products:products,
-          customer:customer,
-          order:order
-        });
-        resolve({
-          status:1,
-          products:products,
-          customer:customer,
-          order:order
-        });
-      }
-      else
-      {
-        console.log({
-          status:0
-        });
-
-        console.log(helper.checkEmpty(customer));
-        console.log(products.length>0 && customer.length>0 && order.length>0);
-        reject({
-          status:0
-        });
-      }
-    });
-}
-
-function getProduct(product_data){
-  let products = [];
-  console.log(product_data);
-  for(let col of product_data){
-    let cols = col.split('|');    
-    if(cols[3])
-      if(cols[3].includes('$')){
-        obj = {
-          name:cols[2],
-          price:cols[3].match(/\d+/g)[0],
-          quantity:cols[1]
-        }
-        products.push(obj);
-      }
-  }
-  return products;
-}
-
-function getCustomer(customer_data){
-  let customer = {};
-  customer['name'] = (customer_data[1]?customer_data[1].split('|')[1].trim():null);
-  customer['city'] = (customer_data[3]?customer_data[3].split('|')[1].trim():null);
-  return customer;
-}
-
-function getOrder(order_data,order_id_arr){
-  console.log(order_id_arr);
-  let order = {};
-  order['subtotal'] = (order_data[0]?order_data[0].split('|')[2].match(/\d+/g)[0]:null);
-  order['delivery'] = (order_data[1]?order_data[1].split('|')[2].match(/\d+/g)[0]:null);
-  order['tax'] = (order_data[2]?order_data[2].split('|')[2].match(/\d+/g)[0]:null);
-  order['tip'] = (order_data[3]?order_data[3].split('|')[2].match(/\d+/g)[0]:null);
-  order['total'] = (order_data[4]?order_data[4].split('|')[2].match(/\d+/g)[0]:null);
-  order['order_id'] = (order_id_arr.length?order_id_arr[0].match(/\d+/g):null)[0];
-
-  return order;
-}
-
-function readJson(file){
-  return fs.readFileSync('Order_Ids.json','utf8');
-}
-
-function writeJson(id){
-  let order_ids = [1,2];
-  fs.writeFileSync('Order_Ids.json', JSON.stringify(order_ids), 'utf8'); 
-}
-
 module.exports={
-  getData:start,
-  writeJson:writeJson,
-  readJson:readJson
+ convertToArray:convertToArray
 }
+
+var answer = '5A';
+console.log(answer.replace(/[a-zA-Z]/g, ''));
+
+//helper.sendEmail({to:'dropmailsanjayrawat@gmail.com',body:'dropmailsanjayrawat@gmail.com',subject:'another test email'})
+
