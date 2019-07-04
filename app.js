@@ -11,7 +11,7 @@ var StoreCode = 103;
 // console.log(fileController.readJson());
 
 
-// var job1 = new CronJob('*/10 * * * * *', function() {
+var job1 = new CronJob('*/10 * * * * *', function() {
     console.log('checking every min for orders--'+helper.getDateTime());
     email_server.checkEmail(vendor).then(function(seq_no){
         // console.log(seq_no);
@@ -24,11 +24,11 @@ var StoreCode = 103;
             console.log(err);
         })
     })
-// }, function() {
-//     console.log(moment().format('DD MMM YYYY:hh:mm:ss'), " Sync PromotionTable Last 30 days");
-// },
-//     true /* Start the job right now */
-// );
+}, function() {
+    console.log(moment().format('DD MMM YYYY:hh:mm:ss'), " Sync PromotionTable Last 30 days");
+},
+    true /* Start the job right now */
+);
 
 
 

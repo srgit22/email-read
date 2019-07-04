@@ -55,10 +55,10 @@ var Order = {
         console.log('email found');
         order_data['CustomerDetails']={
           "Address": [
-                  {street:data.customer.city},
-                  {city:data.customer.city},
-                  {zipcode:data.customer.city},
-                  {country:data.customer.city}
+                  {Street:data.customer.city},
+                  {City:data.customer.city},
+                  {ZipCode:data.customer.city},
+                  {Country:data.customer.city}
           ],
           "DOB": "",
           "EmailID": null,

@@ -31,7 +31,7 @@ var grubhub ={
         return customer;
     },
     getOrder:function (order_data,order_id_arr){
-        console.log(order_id_arr);
+        // console.log(order_id_arr);
         let order = {};
         order['subtotal'] = (order_data[0]?order_data[0].split('|')[2].match(/\d+/g)[0]:null);
         order['delivery'] = (order_data[1]?order_data[1].split('|')[2].match(/\d+/g)[0]:null);
