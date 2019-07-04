@@ -11,7 +11,7 @@ var StoreCode = 103;
 // console.log(fileController.readJson());
 
 
-// var job1 = new CronJob('*/20 * * * * *', function() {
+// var job1 = new CronJob('*/10 * * * * *', function() {
     console.log('checking every min for orders--'+helper.getDateTime());
     email_server.checkEmail(vendor).then(function(seq_no){
         // console.log(seq_no);
@@ -20,6 +20,7 @@ var StoreCode = 103;
             order.process(vendor,StoreCode);
             helper.writeId(seq_no);
         }).catch((err)=>{
+            console.log('app.js->catch->');
             console.log(err);
         })
     })
