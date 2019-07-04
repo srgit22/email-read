@@ -34,7 +34,7 @@ var grubhub ={
                 let cols = product_data[i].split(currency);
                 obj = {
                     name:cols[1].replace(/[0-9]/g, ''),
-                    price:cols[2].match(/\d+/g)[0],
+                    price:cols[1].match(/\d+/g)[0],
                     quantity:cols[1].match(/\d+/g)[0]
                 }
             products.push(obj);
