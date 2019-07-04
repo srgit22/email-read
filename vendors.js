@@ -10,24 +10,52 @@ var grubhub ={
     getProduct:function(product_data){
         let products = [];
         console.log(product_data);
-        for(let col of product_data){
-        let cols = col.split('|');    
-        if(cols[3])
-            if(cols[3].includes('$')){
-            obj = {
-                name:cols[2],
-                price:cols[3].match(/\d+/g)[0],
-                quantity:cols[1]
+
+        if(pattern=='1'){
+            for(let col of product_data){
+            let cols = col.split('|');    
+            if(cols[3])
+                if(cols[3].includes('$')){
+                obj = {
+                    name:cols[2],
+                    price:cols[3].match(/\d+/g)[0],
+                    quantity:cols[1]
+                }
+            
+                products.push(obj);
             }
-            products.push(obj);
+            }
+        }
+        if(pattern=='2'){
+            for(let i=0;i<product_data.length;i++){    
+            console.log(product_data[i]);
+                if(product_data[i].includes(currency)){
+                    let cols = product_data[i].split(currency);
+                    obj = {
+                        name:cols[0].replace(/[0-9]/g, ''),
+                        price:cols[1].match(/\d+/g)[0],
+                        quantity:cols[1].match(/\d+/g)[0]
+                    }
+
+                products.push(obj);
+                }
             }
         }
         return products;
     },
     getCustomer:function (customer_data){
         let customer = {};
-        customer['name'] = (customer_data[1]?customer_data[1].split('|')[1].trim():null);
-        customer['city'] = (customer_data[3]?customer_data[3].split('|')[1].trim():null);
+        if(pattern=='1'){
+                customer['name'] = (customer_data[1]?customer_data[1].split('|')[1].trim():null);
+                customer['city'] = (customer_data[3]?customer_data[3].split('|')[1].trim():null);
+        }
+        else if(pattern=='1'){
+            customer['name'] = (customer_data[1]?customer_data[1].split(',')[0].trim():null);
+            customer['street'] = (customer_data[2]?customer_data[3].split('PM')[0].trim():null);
+            customer['city'] = (customer_data[3]?customer_data[3].split(',')[0].trim():null);
+            customer['mobile_no'] = (customer_data[customer_data.length-3]?customer_data[customer_data.length-3].trim():'9999999999');
+        }
+        
         return customer;
     },
     getOrder:function (order_data,order_id_arr){
