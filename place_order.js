@@ -6,7 +6,7 @@ var helper = require('./helper.js');
 
 var vendor = 'GrubHub.com';
 var vendor = 'Swiggy';
-var StoreCode = 134;
+var StoreCode = 135;
 
 var order_data = {
 	"OrderBy": "",
@@ -29,10 +29,10 @@ var order_data = {
 	"OrderBooking": {
 		"DeliveryCharges": 0,
 		"PosId": 1,
-		"StoreCode": 134
+		"StoreCode": 103
 	},
 	"OrderStatus": 3,
-	"OrderType": 1,
+	"OrderType": 2,
 	"paymentMode": 2,
 	"Source": 3,
 	"SpecialRequest": "",   
@@ -55,14 +55,17 @@ var Order = {
         console.log('email found');
         order_data['CustomerDetails']={
           "Address": [
-            {city:data.customer.city}
+                  {street:data.customer.city},
+                  {city:data.customer.city},
+                  {zipcode:data.customer.city},
+                  {country:data.customer.city}
           ],
           "DOB": "",
           "EmailID": null,
           "FirstName": data.customer.name,
           "LastName": '',
           "LoyaltyPoint": 0,
-          "Mobile": null,
+          "Mobile": '9999999999',
           "RedeemLoyaltyPoint": 0
         }
         order_data['PaymentTrans'] = {
@@ -72,7 +75,7 @@ var Order = {
           "PackagingCharges": 0,
           "ServiceTax": 0,
           "SplitTransactions": [],
-          "StoreCode": 134,
+          "StoreCode": 103,
           "SubTotal": data.order.subtotal,
           "Tip": data.order.tip,
           "TipAmount": 0,
@@ -89,7 +92,7 @@ var Order = {
         console.log(order_data);
 
         db.searchProduct(data.products).then((products)=>{
-          if(products.length){
+          if(0){
             order_data['ItemDetails']=products.map((obj)=>{
   
               return{
@@ -119,8 +122,8 @@ var Order = {
             order_data['ItemDetails']=data.products.map((obj)=>{
   
               return{
-              "calculated_tax": "0.149",
-              "categoryId":'123232',
+              "calculated_tax": "0.00",
+              "categoryId":'5cdf941c5d1b606dd110d595',
               "isCartConfirmItem": true,
               "IsComplementory": false,
               "isConfirmItem": false,
@@ -129,9 +132,9 @@ var Order = {
               "isSelect": false,
               "IsSpoil": false,
               "isSynced": false,
-              "ItemID": '12232',
+              "ItemID": '5cdf941c5d1b606dd110d595',
               "ItemName": obj.name,
-              "Quantity": 1,
+              "Quantity": obj.quantity,
               "Price": obj.price,
               "ItemStatus": 1,
               "Modifiers": [],
@@ -142,8 +145,20 @@ var Order = {
           });
           
         }
+
+        order_data['PaymentTrans']['StoreCode'] = StoreCode;
+        order_data['OrderBooking']['StoreCode'] = StoreCode;
+
           // if(fileController.checkOrderId())
-          Order.placeOrder(order_data);
+          if(order_data['PaymentTrans']['StoreCode']==103 && order_data['OrderBooking']['StoreCode'] ==103){
+            console.log('-->store-code');
+            console.log(order_data['OrderBooking']['StoreCode'])
+            Order.placeOrder(order_data);
+          }
+          else
+          {
+            console.log('reject order');
+          }
         });
       }
       else{
@@ -156,8 +171,8 @@ var Order = {
   },
   placeOrder:function(data){
 
-    var url = 'http://104.211.49.150:6060/api/placeOrder';
-    // var url = 'http://184.72.111.178:6060/api/placeOrder';
+    // var url = 'http://104.211.49.150:6060/api/placeOrder';
+    var url = 'http://184.72.111.178:6060/api/placeOrder';
 
       axios.post(url, data)
         .then(function (response) {

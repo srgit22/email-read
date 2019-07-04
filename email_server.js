@@ -3,7 +3,7 @@ var Imap = require('imap'),
 
 var fs = require('fs');    
 var helper = require('./helper.js');
-
+var email_seq_no;
 var Imap = require('imap');
 //configure imap credentials
 var imap = new Imap({
@@ -72,9 +72,12 @@ module.exports ={
                                         // 	console.log(parsed);
                                         // 			fs.writeFileSync('mail_data.txt', '\n '+JSON.stringify(parsed), 'utf8'); 
                                         // });
+                                        email_seq_no = seqno;
+                                        console.log('==>'+seqno);
                                         helper.checkEmailProcessed(seqno).then((abc)=>{
                                             fs.writeFileSync('email_data.txt', '\n '+prefix, 'utf8'); 
                                             fs.appendFileSync('email_data.txt', '\n '+chunk, 'utf8');
+                                            resolve(seqno);
                                         }); 
                                     })
                                         
@@ -104,7 +107,7 @@ module.exports ={
                         f.once('end', function() {
                             console.log('Done fetching all messages!');
                             imap.end();
-                            resolve();
+                            resolve(email_seq_no);
                         });
 
                     });//search
