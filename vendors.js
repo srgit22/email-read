@@ -33,7 +33,7 @@ var grubhub ={
             if(product_data[i].includes(currency)){
                 let cols = product_data[i].split(currency);
                 obj = {
-                    name:cols[1].replace(/[0-9]/g, ''),
+                    name:cols[0].replace(/[0-9]/g, ''),
                     price:cols[1].match(/\d+/g)[0],
                     quantity:cols[1].match(/\d+/g)[0]
                 }
@@ -44,8 +44,10 @@ var grubhub ={
     },
     getCustomer:function (customer_data){
         let customer = {};
-        customer['name'] = (customer_data[1]?customer_data[1].split(',')[1].trim():null);
-        customer['city'] = (customer_data[3]?customer_data[3].split(',')[1].trim():null);
+        customer['name'] = (customer_data[1]?customer_data[1].split(',')[0].trim():null);
+        customer['street'] = (customer_data[2]?customer_data[3].split('PM')[0].trim():null);
+        customer['city'] = (customer_data[3]?customer_data[3].split(',')[0].trim():null);
+        customer['mobile_no'] = (customer_data[customer_data.length-3]?customer_data[customer_data.length-3].trim():'9999999999');
         return customer;
     },
     getOrder:function (order_data,order_id_arr=false){

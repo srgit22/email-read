@@ -55,17 +55,15 @@ var Order = {
         console.log('email found');
         order_data['CustomerDetails']={
           "Address": [
-                  {street:data.customer.city},
-                  {city:data.customer.city},
-                  {zipcode:data.customer.city},
-                  {country:data.customer.city}
+                  {Street:data.customer.street},
+                  {City:data.customer.city},
           ],
           "DOB": "",
           "EmailID": null,
           "FirstName": data.customer.name,
           "LastName": '',
           "LoyaltyPoint": 0,
-          "Mobile": '9999999999',
+          "Mobile":data.customer.mobile_no,
           "RedeemLoyaltyPoint": 0
         }
         order_data['PaymentTrans'] = {
