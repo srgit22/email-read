@@ -7,36 +7,18 @@ const fs = require('fs');
 // var currency = '$';
 
 var grubhub ={
-    // getProduct:function(product_data){
-    //     let products = [];
-    //     console.log(product_data);
-    //     for(let col of product_data){
-    //     let cols = col.split('|');    
-    //     if(cols[3])
-    //         if(cols[3].includes('$')){
-    //         obj = {
-    //             name:cols[2],
-    //             price:cols[3].match(/\d+/g)[0],
-    //             quantity:cols[1]
-    //         }
-    //         products.push(obj);
-    //         }
-    //     }
-    //     return products;
-    // },
     getProduct:function(product_data){
-        var currency = '$';
         let products = [];
         console.log(product_data);
-        for(let i=0;i<product_data.length;i++){    
-        console.log(product_data[i]);
-            if(product_data[i].includes(currency)){
-                let cols = product_data[i].split(currency);
-                obj = {
-                    name:cols[1].replace(/[0-9]/g, ''),
-                    price:cols[2].match(/\d+/g)[0],
-                    quantity:cols[1].match(/\d+/g)[0]
-                }
+        for(let col of product_data){
+        let cols = col.split('|');    
+        if(cols[3])
+            if(cols[3].includes('$')){
+            obj = {
+                name:cols[2],
+                price:cols[3].match(/\d+/g)[0],
+                quantity:cols[1]
+            }
             products.push(obj);
             }
         }
@@ -44,20 +26,19 @@ var grubhub ={
     },
     getCustomer:function (customer_data){
         let customer = {};
-        customer['name'] = (customer_data[1]?customer_data[1].split(',')[1].trim():null);
-        customer['city'] = (customer_data[3]?customer_data[3].split(',')[1].trim():null);
+        customer['name'] = (customer_data[1]?customer_data[1].split('|')[1].trim():null);
+        customer['city'] = (customer_data[3]?customer_data[3].split('|')[1].trim():null);
         return customer;
     },
-    getOrder:function (order_data,order_id_arr=false){
-        var currency = '$';
-        // console.log(order_id_arr);
+    getOrder:function (order_data,order_id_arr){
+        console.log(order_id_arr);
         let order = {};
-        order['subtotal'] = (order_data[0]?order_data[0].split(currency)[1].match(/\d+/g)[0]:null);
-        order['delivery'] = (order_data[1]?order_data[1].split(currency)[1].match(/\d+/g)[0]:null);
-        order['tax'] = (order_data[2]?order_data[2].split(currency)[1].match(/\d+/g)[0]:null);
-        order['tip'] = (order_data[3]?order_data[3].split(currency)[1].match(/\d+/g)[0]:null);
-        order['total'] = (order_data[4]?order_data[4].split(currency)[1].match(/\d+/g)[0]:null);
-        // order['order_id'] = (order_id_arr.length?order_id_arr[0].match(/\d+/g):null)[0];
+        order['subtotal'] = (order_data[0]?order_data[0].split('|')[2].match(/\d+/g)[0]:null);
+        order['delivery'] = (order_data[1]?order_data[1].split('|')[2].match(/\d+/g)[0]:null);
+        order['tax'] = (order_data[2]?order_data[2].split('|')[2].match(/\d+/g)[0]:null);
+        order['tip'] = (order_data[3]?order_data[3].split('|')[2].match(/\d+/g)[0]:null);
+        order['total'] = (order_data[4]?order_data[4].split('|')[2].match(/\d+/g)[0]:null);
+        order['order_id'] = (order_id_arr.length?order_id_arr[0].match(/\d+/g):null)[0];
     
         return order;
     }

@@ -14,9 +14,8 @@ var StoreCode = 103;
 // var job1 = new CronJob('*/20 * * * * *', function() {
     console.log('checking every min for orders--'+helper.getDateTime());
     email_server.checkEmail(vendor).then(function(seq_no){
-        console.log(seq_no);
-        order.process(vendor,StoreCode);
-  
+        // console.log(seq_no);
+        // order.process(vendor,StoreCode);  
         helper.checkEmailProcessed(seq_no).then((abc)=>{
             order.process(vendor,StoreCode);
             helper.writeId(seq_no);

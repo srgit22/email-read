@@ -16,12 +16,12 @@ function getData(vendor){
     if(vendor=='grubhub'){
         fc.convertToArray('email_data.txt').then((data_arr)=>{
 
-            // product_data = helper.extractData(data_arr,'| Qty | Item | Price |','Prepaid. DO NOT charge');
-            product_data = helper.extractData(data_arr,'Qty Item Price','Prepaid. DO NOT charge');
-            order_data = helper.extractData(data_arr,'Subtotal','Total');
+            product_data = helper.extractData(data_arr,'| Qty | Item | Price |','Prepaid. DO NOT charge');
+            order_data = helper.extractData(data_arr,'| Subtotal |','| Total |');
             order_id_arr = helper.extractData(data_arr,'Order #','Order #');
-            customer_data = helper.extractData(data_arr,'Deliver to: Deliver','Special Instructions');
+            customer_data = helper.extractData(data_arr,'| Deliver to: | Deliver |','| Special Instructions |');
             console.log(data_arr);
+
             
             products = vendors.getProduct(vendor,product_data);
             customer = vendors.getCustomer(vendor,customer_data);
