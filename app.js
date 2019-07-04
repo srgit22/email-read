@@ -11,24 +11,25 @@ var StoreCode = 103;
 // console.log(fileController.readJson());
 
 
-var job1 = new CronJob('*/10 * * * * *', function() {
+// var job1 = new CronJob('*/20 * * * * *', function() {
     console.log('checking every min for orders--'+helper.getDateTime());
     email_server.checkEmail(vendor).then(function(seq_no){
-        // console.log(seq_no);
-        // order.process(vendor,StoreCode);  
         helper.checkEmailProcessed(seq_no).then((abc)=>{
-            order.process(vendor,StoreCode);
-            helper.writeId(seq_no);
+            order.process(vendor,StoreCode).then((data)=>{
+                console.log('order data-->');
+                console.log(data);
+                helper.writeId(seq_no);
+            })
         }).catch((err)=>{
             console.log('app.js->catch->');
             console.log(err);
         })
     })
-}, function() {
-    console.log(moment().format('DD MMM YYYY:hh:mm:ss'), " Sync PromotionTable Last 30 days");
-},
-    true /* Start the job right now */
-);
+// }, function() {
+//     console.log(moment().format('DD MMM YYYY:hh:mm:ss'), " Sync PromotionTable Last 30 days");
+// },
+//     true /* Start the job right now */
+// );
 
 
 

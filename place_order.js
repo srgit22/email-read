@@ -49,7 +49,7 @@ var order_data = {
 
 var Order = {
   process:function(vendor,StoreCode){
-    vp.getData(vendor).then((data)=>{
+    return vp.getData(vendor).then((data)=>{
       console.log(data);
       if(data.status){
         console.log('email found');
@@ -89,75 +89,77 @@ var Order = {
         console.log('-->');
         console.log(order_data);
 
-        db.searchProduct(data.products).then((products)=>{
-          if(0){
-            order_data['ItemDetails']=products.map((obj)=>{
+        // db.searchProduct(data.products).then((products)=>{
+        //   if(0){
+        //     order_data['ItemDetails']=products.map((obj)=>{
   
-              return{
-              "calculated_tax": "0.149",
-              "categoryId":obj.CategoryID,
-              "isCartConfirmItem": true,
-              "IsComplementory": false,
-              "isConfirmItem": false,
-              "isDrink": false,
-              "isPrintKot": false,
-              "isSelect": false,
-              "IsSpoil": false,
-              "isSynced": false,
-              "ItemID": obj._id,
-              "ItemName": obj.ItemName,
-              "Quantity": 1,
-              "Price": obj.Price,
-              "ItemStatus": 1,
-              "Modifiers": [],
-              "Taxes": [],
-              "Unit": "QTY",
-              "Extras": ""
-              }
-            })
-          }else{
-            console.log('products not found in store database');
-            order_data['ItemDetails']=data.products.map((obj)=>{
-  
-              return{
-              "calculated_tax": "0.00",
-              "categoryId":'5cdf941c5d1b606dd110d595',
-              "isCartConfirmItem": true,
-              "IsComplementory": false,
-              "isConfirmItem": false,
-              "isDrink": false,
-              "isPrintKot": false,
-              "isSelect": false,
-              "IsSpoil": false,
-              "isSynced": false,
-              "ItemID": '5cdf941c5d1b606dd110d595',
-              "ItemName": obj.name,
-              "Quantity": obj.quantity,
-              "Price": obj.price,
-              "ItemStatus": 1,
-              "Modifiers": [],
-              "Taxes": [],
-              "Unit": "QTY",
-              "Extras": ""
-              }
-          });
+        //       return{
+        //       "calculated_tax": "0.149",
+        //       "categoryId":obj.CategoryID,
+        //       "isCartConfirmItem": true,
+        //       "IsComplementory": false,
+        //       "isConfirmItem": false,
+        //       "isDrink": false,
+        //       "isPrintKot": false,
+        //       "isSelect": false,
+        //       "IsSpoil": false,
+        //       "isSynced": false,
+        //       "ItemID": obj._id,
+        //       "ItemName": obj.ItemName,
+        //       "Quantity": 1,
+        //       "Price": obj.Price,
+        //       "ItemStatus": 1,
+        //       "Modifiers": [],
+        //       "Taxes": [],
+        //       "Unit": "QTY",
+        //       "Extras": ""
+        //       }
+        //     })
+        //   }else{
+        //     console.log('products not found in store database');
           
-        }
+        // }
+        // });
+
+        order_data['ItemDetails']=data.products.map((obj)=>{
+  
+          return{
+          "calculated_tax": "0.00",
+          "categoryId":'5cdf941c5d1b606dd110d595',
+          "isCartConfirmItem": true,
+          "IsComplementory": false,
+          "isConfirmItem": false,
+          "isDrink": false,
+          "isPrintKot": false,
+          "isSelect": false,
+          "IsSpoil": false,
+          "isSynced": false,
+          "ItemID": '5cdf941c5d1b606dd110d595',
+          "ItemName": obj.name,
+          "Quantity": obj.quantity,
+          "Price": obj.price,
+          "ItemStatus": 1,
+          "Modifiers": [],
+          "Taxes": [],
+          "Unit": "QTY",
+          "Extras": ""
+          }
+        });
 
         order_data['PaymentTrans']['StoreCode'] = StoreCode;
         order_data['OrderBooking']['StoreCode'] = StoreCode;
 
-          // if(fileController.checkOrderId())
-          if(order_data['PaymentTrans']['StoreCode']==103 && order_data['OrderBooking']['StoreCode'] ==103){
-            console.log('-->store-code');
-            console.log(order_data['OrderBooking']['StoreCode'])
-            Order.placeOrder(order_data);
-          }
-          else
-          {
-            console.log('reject order');
-          }
-        });
+        // if(fileController.checkOrderId())
+        if(order_data['PaymentTrans']['StoreCode']==103 && order_data['OrderBooking']['StoreCode'] ==103){
+          console.log('-->store-code');
+          console.log(order_data['OrderBooking']['StoreCode'])
+          return  Order.placeOrder(order_data);
+        }
+        else
+        {
+          console.log('reject order');
+        }
+       
       }
       else{
         console.log('Order data not found on email or Email not found');
@@ -172,13 +174,8 @@ var Order = {
     // var url = 'http://104.211.49.150:6060/api/placeOrder';
     var url = 'http://184.72.111.178:6060/api/placeOrder';
 
-      axios.post(url, data)
-        .then(function (response) {
-          console.log(response);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+    return axios.post(url, data)
+   
   }
 }
 

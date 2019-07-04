@@ -10,12 +10,12 @@ var grubhub ={
     getProduct:function(product_data,pattern){
         let products = [];
         console.log(product_data);
-
+        let currency = '$';
         if(pattern=='1'){
             for(let col of product_data){
                 let cols = col.split('|');    
                 if(cols[3])
-                    if(cols[3].includes('$')){
+                    if(cols[3].includes(currency)){
                     obj = {
                         name:cols[2],
                         price:cols[3].match(/\d+/g)[0],

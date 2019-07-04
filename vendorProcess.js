@@ -30,17 +30,17 @@ function getData(vendor){
                 search['customer_stop']= '| Special Instructions |';
 
             }
-            else if(helper.extractData(data_arr,'| Qty | Item | Price |','| Qty | Item | Price |').length){
+            else if(helper.extractData(data_arr,'Qty Item Price','Qty Item Price').length){
                 pattern = 2;
 
-                search['product_start'] = '| Qty | Item | Price |';
+                search['product_start'] = 'Qty Item Price';
                 search['product_stop']= 'Prepaid. DO NOT charge';
 
-                search['order_start'] = '| Subtotal |';
-                search['order_stop']= '| Total |';
+                search['order_start'] = 'Subtotal';
+                search['order_stop']= 'Total';
 
-                search['customer_start'] = '| Deliver to: | Deliver |';
-                search['customer_stop']= '| Special Instructions |';
+                search['customer_start'] = 'Deliver to: Deliver';
+                search['customer_stop']= 'Special Instructions';
                 
             }
 
@@ -49,8 +49,7 @@ function getData(vendor){
             // order_id_arr = helper.extractData(data_arr,'Order #','Order #');
             customer_data = helper.extractData(data_arr,search['customer_start'],search['customer_stop']);
             console.log(data_arr);
-
-            
+           
             products = vendors.getProduct(vendor,product_data,pattern);
             customer = vendors.getCustomer(vendor,customer_data,pattern);
             order = vendors.getOrder(vendor,order_data,pattern);

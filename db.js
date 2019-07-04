@@ -19,8 +19,6 @@ module.exports = {
                 // let query = {$and:[or_query,{StoreCode:{$elemMatch:{$eq:121}}}]};
                 let query = or_query
                 
-                console.log(JSON.stringify(query));
-                console.log(db);
                 db.collection('ItemMaster').find(query).toArray().then((data)=>{
                     console.log(data);
                     if(data)
