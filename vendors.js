@@ -4,41 +4,84 @@ const helper = require('./helper');
 const fc = require('./fileController');
 var swiggyFileLink='https://www.swiggy.com/invoice/download?token=';
 const fs = require('fs');
+// var currency = '$';
 
 var grubhub ={
-    getProduct:function(product_data){
+    getProduct:function(product_data,pattern){
         let products = [];
         console.log(product_data);
-        for(let col of product_data){
-        let cols = col.split('|');    
-        if(cols[3])
-            if(cols[3].includes('$')){
-            obj = {
-                name:cols[2],
-                price:cols[3].match(/\d+/g)[0],
-                quantity:cols[1]
+        let currency = '$';
+        if(pattern=='1'){
+            for(let col of product_data){
+                let cols = col.split('|');    
+                if(cols[3])
+                    if(cols[3].includes(currency)){
+                    obj = {
+                        name:cols[2],
+                        price:cols[3].match(/\d+/g)[0],
+                        quantity:cols[1]
+                    }
+                
+                    products.push(obj);
+                }
             }
-            products.push(obj);
+        }
+        else if(pattern=='2'){
+            for(let i=0;i<product_data.length;i++){    
+            console.log(product_data[i]);
+                if(product_data[i].includes(currency)){
+                    let cols = product_data[i].split(currency);
+                    obj = {
+                        name:cols[0].replace(/[0-9]/g, ''),
+                        price:cols[1].match(/\d+/g)[0],
+                        quantity:cols[1].match(/\d+/g)[0]
+                    }
+
+                products.push(obj);
+                }
             }
         }
         return products;
     },
-    getCustomer:function (customer_data){
+    getCustomer:function (customer_data,pattern){
         let customer = {};
-        customer['name'] = (customer_data[1]?customer_data[1].split('|')[1].trim():null);
-        customer['city'] = (customer_data[3]?customer_data[3].split('|')[1].trim():null);
+
+        if(pattern=='1'){
+                customer['name'] = (customer_data[1]?customer_data[1].split('|')[1].trim():null);
+                customer['street'] = '';
+                customer['city'] = (customer_data[3]?customer_data[3].split('|')[1].trim():null);
+                customer['mobile_no'] = '9999999999';
+        }
+        else if(pattern=='2'){
+            customer['name'] = (customer_data[1]?customer_data[1].split(',')[0].trim():null);
+            customer['street'] = (customer_data[2]?customer_data[3].split('PM')[0].trim():null);
+            customer['city'] = (customer_data[3]?customer_data[3].split(',')[0].trim():null);
+            customer['mobile_no'] = (customer_data[customer_data.length-3]?customer_data[customer_data.length-3].trim():'9999999999');
+        }
+        
         return customer;
     },
-    getOrder:function (order_data,order_id_arr){
-        console.log(order_id_arr);
+    getOrder:function (order_data,pattern){
+        // console.log(order_id_arr);
         let order = {};
-        order['subtotal'] = (order_data[0]?order_data[0].split('|')[2].match(/\d+/g)[0]:null);
-        order['delivery'] = (order_data[1]?order_data[1].split('|')[2].match(/\d+/g)[0]:null);
-        order['tax'] = (order_data[2]?order_data[2].split('|')[2].match(/\d+/g)[0]:null);
-        order['tip'] = (order_data[3]?order_data[3].split('|')[2].match(/\d+/g)[0]:null);
-        order['total'] = (order_data[4]?order_data[4].split('|')[2].match(/\d+/g)[0]:null);
-        order['order_id'] = (order_id_arr.length?order_id_arr[0].match(/\d+/g):null)[0];
-    
+        
+        if(pattern=='1'){
+            order['subtotal'] = (order_data[0]?order_data[0].split('|')[2].match(/\d+/g)[0]:null);
+            order['delivery'] = (order_data[1]?order_data[1].split('|')[2].match(/\d+/g)[0]:null);
+            order['tax'] = (order_data[2]?order_data[2].split('|')[2].match(/\d+/g)[0]:null);
+            order['tip'] = (order_data[3]?order_data[3].split('|')[2].match(/\d+/g)[0]:null);
+            order['total'] = (order_data[4]?order_data[4].split('|')[2].match(/\d+/g)[0]:null);
+            // order['order_id'] = (order_id_arr.length?order_id_arr[0].match(/\d+/g):null)[0];
+        }
+        else if(pattern=='2'){
+            let currency = '$';
+            order['subtotal'] = (order_data[0]?order_data[0].split(currency)[1].match(/\d+/g)[0]:null);
+            order['delivery'] = (order_data[1]?order_data[1].split(currency)[1].match(/\d+/g)[0]:null);
+            order['tax'] = (order_data[2]?order_data[2].split(currency)[1].match(/\d+/g)[0]:null);
+            order['tip'] = (order_data[3]?order_data[3].split(currency)[1].match(/\d+/g)[0]:null);
+            order['total'] = (order_data[4]?order_data[4].split(currency)[1].match(/\d+/g)[0]:null);
+            // order['order_id'] = (order_id_arr.length?order_id_arr[0].match(/\d+/g):null)[0];
+        }
         return order;
     }
 }
@@ -58,6 +101,7 @@ var swiggy ={
                     cols = col.split('₹');    
                 }
                 else if(col.includes('$')){
+                    
                     cols = col.split('$');
                 }
                 else{
@@ -118,25 +162,25 @@ var swiggy ={
 
 
 var vendor_obj = {
-    getProduct:function(vendor,data){
+    getProduct:function(vendor,data,pattern=false){
         if(vendor=="grubhub"){
-            return grubhub.getProduct(data);
+            return grubhub.getProduct(data,pattern);
         }
         else if(vendor=="swiggy"){
             return swiggy.getProduct(data);
         }
     },
-    getCustomer:function(vendor,data){
+    getCustomer:function(vendor,data,pattern=false){
         if(vendor=="grubhub"){
-            return grubhub.getCustomer(data);
+            return grubhub.getCustomer(data,pattern);
         }
         else if(vendor=="swiggy"){
             return swiggy.getCustomer(data);
         }
     },
-    getOrder:function(vendor,data,order_id_arr){
+    getOrder:function(vendor,data,pattern){
         if(vendor=="grubhub"){
-            return grubhub.getOrder(data,order_id_arr);
+            return grubhub.getOrder(data,pattern);
         }
         else if(vendor=="swiggy"){
             return swiggy.getOrder(data);

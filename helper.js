@@ -13,13 +13,13 @@ module.exports = {
         	
         var today = new Date();
         let month = today.getMonth()+1;
-        return ('0'+month+'/'+today.getDate()+'/'+today.getFullYear());
+        return ('0'+month+'/'+(today.getDate()<10?'0'+today.getDate():today.getDate())+'/'+today.getFullYear());
         
     },
     getDateTime:function (){
         var today = new Date();
         let month = today.getMonth()+1;
-        var date = today.getFullYear()+'-'+'0'+month+'-'+today.getDate();
+        var date = today.getFullYear()+'-'+'0'+month+'-'+(today.getDate()<10?'0'+today.getDate():today.getDate());
         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
         return `${date} ${time}`;
     },
@@ -27,12 +27,18 @@ module.exports = {
         return new Promise((resolve,reject)=>{
             var seq_arr = JSON.parse(fs.readFileSync('Order_Ids.json', 'utf8'));
             if(!seq_arr.includes(seq_no)){
-                seq_arr.push(seq_no);
-                fs.writeFileSync('Order_Ids.json', JSON.stringify(seq_arr), 'utf8');
                 resolve();
             }
-            //reject();    
+            else{
+                // reject(seq_no+'already processed');
+            }
+                
         })
+    },
+    writeId:function(seq_no){
+        var seq_arr = JSON.parse(fs.readFileSync('Order_Ids.json', 'utf8'));
+        seq_arr.push(seq_no);
+        fs.writeFileSync('Order_Ids.json', JSON.stringify(seq_arr), 'utf8');
     },
     extractData:function(data_arr,start,stop){
     
@@ -51,6 +57,7 @@ module.exports = {
             
             if(line.includes(stop)){
                 record = false;
+                break;
             }
         }
     
@@ -85,7 +92,7 @@ module.exports = {
             from: 'receipt@cravrr.com',
             to: obj.to,//'dropmailsanjayrawat@gmail.com',
             subject: obj.subject,//'Sending Email using Node.js',
-            text: obj.body//'That was easy!'
+            html: obj.body//'That was easy!'
           };
 
           console.log("mailOptions=",mailOptions);
@@ -99,3 +106,4 @@ module.exports = {
           });
     }
 }
+

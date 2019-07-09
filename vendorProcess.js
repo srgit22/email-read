@@ -15,16 +15,44 @@ function getData(vendor){
 
     if(vendor=='grubhub'){
         fc.convertToArray('email_data.txt').then((data_arr)=>{
+            var pattern,search={};
 
-            product_data = helper.extractData(data_arr,'| Qty | Item | Price |','Prepaid. DO NOT charge');
-            order_data = helper.extractData(data_arr,'| Subtotal |','| Total |');
-            order_id_arr = helper.extractData(data_arr,'Order #','Order #');
-            customer_data = helper.extractData(data_arr,'| Deliver to: | Deliver |','| Special Instructions |');
+            if(helper.extractData(data_arr,'| Qty | Item | Price |','| Qty | Item | Price |').length){
+                pattern = 1;
+                                
+                search['product_start'] = '| Qty | Item | Price |';
+                search['product_stop']= 'Prepaid. DO NOT charge';
+
+                search['order_start'] = '| Subtotal |';
+                search['order_stop']= '| Total |';
+
+                search['customer_start'] = '| Deliver to: | Deliver |';
+                search['customer_stop']= '| Special Instructions |';
+
+            }
+            else if(helper.extractData(data_arr,'Qty Item Price','Qty Item Price').length){
+                pattern = 2; 
+
+                search['product_start'] = 'Qty Item Price';
+                search['product_stop']= 'Prepaid. DO NOT charge';
+
+                search['order_start'] = 'Subtotal';
+                search['order_stop']= 'Total';
+
+                search['customer_start'] = 'Deliver to: Deliver';
+                search['customer_stop']= 'Special Instructions';
+                
+            }
+
+            product_data = helper.extractData(data_arr,search['product_start'],search['product_stop']);
+            order_data = helper.extractData(data_arr,search['order_start'],search['order_stop']);
+            // order_id_arr = helper.extractData(data_arr,'Order #','Order #');
+            customer_data = helper.extractData(data_arr,search['customer_start'],search['customer_stop']);
             console.log(data_arr);
-            
-            products = vendors.getProduct(vendor,product_data);
-            customer = vendors.getCustomer(vendor,customer_data);
-            order = vendors.getOrder(vendor,order_data,order_id_arr);
+           
+            products = vendors.getProduct(vendor,product_data,pattern);
+            customer = vendors.getCustomer(vendor,customer_data,pattern);
+            order = vendors.getOrder(vendor,order_data,pattern);
 
             if(products.length>0 && !helper.checkEmpty(customer) && !helper.checkEmpty(order)){
                 resolve({

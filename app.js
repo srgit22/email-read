@@ -5,23 +5,31 @@ var CronJob = require('cron').CronJob;
 
 var vendor = 'grubhub';
 // var vendor = 'swiggy';
-var StoreCode = 134;
+var StoreCode = 103;
 
 // fileController.writeJson();
 // console.log(fileController.readJson());
 
 
-// var job1 = new CronJob('*/1 * * * *', function() {
+var job1 = new CronJob('*/12 * * * * *', function() {
+    console.log('checking every min for orders--'+helper.getDateTime());
     email_server.checkEmail(vendor).then(function(seq_no){
         helper.checkEmailProcessed(seq_no).then((abc)=>{
-            order.process(vendor);
+            order.process(vendor,StoreCode).then((data)=>{
+                console.log('order data-->');
+                console.log(data);
+                helper.writeId(seq_no);
+            })
+        }).catch((err)=>{
+            console.log('app.js->catch->');
+            console.log(err);
         })
     })
-// }, function() {
-//     console.log(moment().format('DD MMM YYYY:hh:mm:ss'), " Sync PromotionTable Last 30 days");
-// },
-// true /* Start the job right now */
-// );
+}, function() {
+    console.log(moment().format('DD MMM YYYY:hh:mm:ss'), " Sync PromotionTable Last 30 days");
+},
+    true /* Start the job right now */
+);
 
 
 
