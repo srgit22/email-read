@@ -150,7 +150,7 @@ var Order = {
         order_data['OrderBooking']['StoreCode'] = StoreCode;
 
         // if(fileController.checkOrderId())
-        if(order_data['PaymentTrans']['StoreCode']==103 && order_data['OrderBooking']['StoreCode'] ==103){
+        if(order_data['PaymentTrans']['StoreCode']==135 && order_data['OrderBooking']['StoreCode'] ==135){
           console.log('-->store-code');
           console.log(order_data['OrderBooking']['StoreCode'])
 
@@ -161,12 +161,23 @@ var Order = {
           //   Order: {
           //           onlineVendorOrderId:0,
           //           subtotal:order_data['subTotal'],
-          //           totalTax:order_data['taxAmount'],
+          //           totalTax:order_data['taxAmount']getData,
           //           Total:order_data['total']
           //         }
           // });
 
-          return  Order.placeOrder(order_data);
+
+          if(0){
+            var url = 'http://localhost:6060/api/specialRequest';
+            return  Order.api(url,order_data);
+          }
+          else{
+            console.log('order placed');
+            // var url = 'http://104.211.49.150:6060/api/placeOrder';
+            var url = 'http://184.72.111.178:6060/api/placeOrder';
+            // var url = 'http://localhost:6060/api/placeOrder';
+            return  Order.api(url,order_data);
+          }
         }
         else
         {
@@ -182,11 +193,7 @@ var Order = {
       console.log(err);
     });
   },
-  placeOrder:function(data){
-
-    // var url = 'http://104.211.49.150:6060/api/placeOrder';
-    var url = 'http://184.72.111.178:6060/api/placeOrder';
-    // var url = 'http://localhost:6060/api/placeOrder';
+  api:function(url,data){
 
     return axios.post(url, data)
    

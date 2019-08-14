@@ -131,6 +131,12 @@ var swiggy ={
             // console.log(data.product_data);
             customer['name'] = data.customer_data[1];
             customer['city'] = data.customer_data[data.customer_data.length-2].split(',')[0];
+
+            // customer['name'] = (customer_data[1]?customer_data[1].split(',')[0].trim():null);
+            // customer['street'] = (customer_data[2]?customer_data[3].split('PM')[0].trim():null);
+            // customer['city'] = (customer_data[3]?customer_data[3].split(',')[0].trim():null);
+            // customer['mobile_no'] = (customer_data[customer_data.length-3]?customer_data[customer_data.length-3].trim():'9999999999');
+
             return customer;
         })
     },
@@ -138,7 +144,7 @@ var swiggy ={
         let order = {};
         let currency;
         return vendor_obj.extractData(link).then((data)=>{
-            
+            console.log(data);
             if(data.order_data[0].includes('₹'))
             {
                 currency = '₹';
