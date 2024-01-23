@@ -7,12 +7,9 @@ var helper = require('./helper.js');
 var Imap = require('imap');
 //configure imap credentials
 var imap = new Imap({
-    user: 'dropmailsanjayrawat@gmail.com',
-    password: 'password4gmail#123', 
+    user: 'test',
+    password: 'passwordtestgmail#123', 
     host: 'imap.gmail.com',
-    // user:'sanjay.rawat@cyntralabs.com',
-    // password:'newpw@Cyntralab123',
-    // host:'imap.mail.yahoo.com',
     port: 993,
     tls: true,
     tlsOptions: {
