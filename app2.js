@@ -2,8 +2,8 @@ var imaps = require('imap-simple');
  
 var config = {
     imap: {
-        user: 'dropmailsanjayrawat@gmail.com',
-        password: 'password4gmail#123', 
+        user: 'test@gmail.com',
+        password: 'test#123', 
         host: 'imap.gmail.com',
         port: 993,
         tls: true,
