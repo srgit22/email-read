@@ -156,8 +156,7 @@ var Order = {
   },
   placeOrder:function(data){
 
-    var url = 'http://104.211.49.150:6060/api/placeOrder';
-    // var url = 'http://184.72.111.178:6060/api/placeOrder';
+	var url='';
 
       axios.post(url, data)
         .then(function (response) {
